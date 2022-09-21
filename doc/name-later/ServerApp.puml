@@ -1,0 +1,44 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class ServerApp {
++ instance() : &ServerApp
++ void start(argc: int, argv: char*[])
+}
+rectangle Parsing {
+class "ConfigFactory<config_type>" {
+    + createConfig<Args...>(Args...) : config_type
+}
+
+class CliOptionsParser
+class ServerConfParser
+class AppConfParser
+
+"ConfigFactory<config_type>" <-- CliOptionsParser
+"ConfigFactory<config_type>" <-- ServerConfParser
+"ConfigFactory<config_type>" <-- AppConfParser
+
+}
+
+rectangle Configuration {
+class Config {
+
+}
+class AppConf
+}
+
+
+class Server
+abstract Socket
+class TCPSocket
+class Epoll
+
+TCPSocket -|> Socket
+
+
+
+
+
+
+
+@enduml
