@@ -1,0 +1,20 @@
+@startuml
+(*) --> if "user gives config file?"
+            --> [yes] "parse config file"
+        else
+        --> [no] "provide default config"
+        --> "parse config file"
+endif
+"parse config file" --> "create server config and init socket(s)"
+"create server config and init socket(s)" --> "add socket(s) to poll"
+"add socket(s) to poll" --> "wait event(s)"
+"wait event(s)" -right-> [event] "new connection"
+"wait event(s)" -left-> [event] "old connection"
+"wait event(s)" -up-> [event] "end connection"
+"new connection" --> "add socket(s) to poll"
+"old connection" --> "handle request(s)"
+"handle request(s)" --> "wait event(s)"
+"end connection" --> "remove socket(s) from poll"
+"remove socket(s) from poll" --> "wait event(s)"
+"wait event(s)" -down-> [signal] "shut down"
+@enduml

@@ -1,0 +1,13 @@
+@startuml
+(*) --> "event received"
+"event received" --> "start thread"
+"start thread" --> "parse request"
+if "success?"
+    --> [no] "set error page"
+    --> "final setup"
+else
+    --> [yes] "response handler"
+    --> "final setup"
+endif
+"final setup" --> "send response"
+@enduml
