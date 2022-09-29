@@ -6,6 +6,7 @@
 #include <csignal>
 #include <sys/stat.h>
 #include <sys/syslog.h>
+#include <iostream>
 #include "serverApp.h"
 
 namespace app {
@@ -16,24 +17,33 @@ namespace app {
 
   void ServerApp::start(int argc, char *argv[]) {
       _cliOptions = ConfigFactory<CliOptions>::make_unique(argc, argv);
-      if (_cliOptions->at<bool>(Option::DAEMON)) {
-          daemonize();
+      _signalHandler = std::make_unique<SignalHandler>();
+
+      if (_cliOptions->as<bool>(option::DAEMON)) {
+          daemonize(_signalHandler);
       }
 
-      while (42);
+      _signalHandler->bind(SIGINT, [](int i) {
+          std::cout << "signal " << i << std::endl;
+          on = false;
+      });
+
+      _serverConf = ServerConf::Builder::parse("../conf/config.yaml");
+
+
+
+      while (on);
   }
 
-  void ServerApp::daemonize() {
+  void ServerApp::daemonize(std::unique_ptr<SignalHandler> const &sigHandler) {
       pid_t pid;
 
       if ((pid = fork()) < 0) { throw std::runtime_error("fork failed"); }
       if (pid > 0) { exit(EXIT_SUCCESS); }
       if (setsid() < 0) { exit(EXIT_FAILURE); }
 
-      /* Catch, ignore and handle signals */
-      //TODO: Implement a working signal handler */
-      signal(SIGCHLD, SIG_IGN);
-      signal(SIGHUP, SIG_IGN);
+      sigHandler->bind(SIGCHLD, SignalHandler::IGNORED);
+      sigHandler->bind(SIGHUP, SignalHandler::IGNORED);
 
       if ((pid = fork()) < 0) { exit(EXIT_FAILURE); }
       if (pid > 0) { exit(EXIT_SUCCESS); }
@@ -45,7 +55,7 @@ namespace app {
       openlog("webserv-neo", LOG_PID, LOG_DAEMON);
   }
   ServerApp::~ServerApp() {
-      if (_cliOptions->at<bool>(Option::DAEMON)) {
+      if (_cliOptions->as<bool>(option::DAEMON)) {
           syslog(LOG_NOTICE, "webserv exited");
           closelog();
       }

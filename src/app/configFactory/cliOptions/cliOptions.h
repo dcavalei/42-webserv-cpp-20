@@ -11,7 +11,7 @@
 #include <stdexcept>
 
 namespace app {
-  enum class Option {
+  enum class option {
       DAEMON
   };
 
@@ -20,16 +20,16 @@ namespace app {
       CliOptions(int argc, char *argv[]);
       CliOptions() = delete;
 
-      [[nodiscard]] bool contains(Option o) const;
+      [[nodiscard]] bool contains(option o) const;
       template<typename T>
-      [[nodiscard]] T &at(Option o) {
+      [[nodiscard]] T &as(option o) {
           return std::any_cast<T &>(_map.at(o));
       }
     private:
       void addOption(std::string const &name, std::string const &value);
 
       static constexpr size_t _bufferSize = 128;
-      std::map<Option, std::any> _map;
+      std::map<option, std::any> _map;
   };
 } // app
 
