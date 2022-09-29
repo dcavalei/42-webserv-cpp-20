@@ -6,7 +6,8 @@
 #define SRC_CONFIGFACTORY_CONFIGFACTORY_H
 
 #include <utility>
-#include "cliOptions/cliOptions.h"
+#include "./cliOptions/cliOptions.h"
+#include "../serverConf/serverConf.h"
 
 namespace app {
 
@@ -21,13 +22,20 @@ namespace app {
   class ConfigFactory {
     public:
       template<typename... Args>
-      static T make(Args... values) { return T(values...); }
+      static std::unique_ptr<T> make_unique(Args... values) {
+          auto ptr = std::make_unique<T>(values...);
+          verify(std::move(ptr));
+          return ptr;
+      }
 
-      template<typename... Args>
-      static std::unique_ptr<T> make_unique(Args... values) { return std::make_unique<T>(values...); }
+    private:
+      static std::unique_ptr<CliOptions> &&verify(std::unique_ptr<CliOptions> &&ptr) {
+          return std::move(ptr);
+      }
 
-      template<typename... Args>
-      static std::shared_ptr<T> make_shared(Args... values) { return std::make_shared<T>(values...); }
+//      static std::unique_ptr<CliOptions> &&verify(std::unique_ptr<CliOptions> &&ptr) {
+//          return std::move(ptr);
+//      }
 
   };
 } // app

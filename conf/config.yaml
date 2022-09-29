@@ -1,0 +1,27 @@
+server:
+  localhost:
+    listen: [ 80, 81 ]
+    location:
+      /path/to/dir/:
+        root: "/"
+
+      /google/:
+        redirect:
+          code: 301
+          url: "https://google.com"
+
+      /cgi/:
+        root: "/cgi-bin"
+        cgi: true
+
+      /autoindex/:
+        root: "/"
+        autoindex: true
+
+      /allowed-methods/:
+        root: "/"
+        allowed-methods: [ POST ]
+
+  google:
+
+  amazon:

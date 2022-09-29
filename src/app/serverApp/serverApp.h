@@ -8,12 +8,11 @@
 #include <memory>
 //#include "log/log.h"
 #include "../configFactory/configFactory.h"
+#include "../signalHandler/signalHandler.h"
 
 namespace app {
 
   class ServerApp {
-    private:
-      ServerApp() = default;
     public:
       ServerApp(const ServerApp &) = delete;
       ServerApp &operator=(const ServerApp &) = delete;
@@ -22,11 +21,18 @@ namespace app {
       ~ServerApp();
 
       static ServerApp &instance();
-      static void daemonize();
+      static void daemonize(const std::unique_ptr<SignalHandler>& sh);
       void start(int argc, char *argv[]);
 
     private:
+      ServerApp() = default;
+
+    public:
+      static inline volatile std::sig_atomic_t on = 42;
+    private:
       std::unique_ptr<CliOptions> _cliOptions;
+      std::unique_ptr<SignalHandler> _signalHandler;
+      std::unique_ptr<ServerConf> _serverConf;
   };
 } // app
 

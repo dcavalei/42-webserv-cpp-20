@@ -8,7 +8,7 @@
 namespace app {
 
   CliOptions::CliOptions(int argc, char *argv[])
-          : _map({{Option::DAEMON, false}}) {
+          : _map({{option::DAEMON, false}}) {
       for (int i = 1; i < argc; ++i) {
           if (std::strlen(argv[0]) >= _bufferSize) {
               continue;
@@ -24,12 +24,12 @@ namespace app {
 
   void CliOptions::addOption(std::string const &name, std::string const &value) {
       if (name == "daemon") {
-          _map[Option::DAEMON] = (value == "on");
+          _map[option::DAEMON] = (value == "on");
       } else {
       }
   }
 
-  bool CliOptions::contains(Option o) const {
+  bool CliOptions::contains(option o) const {
       return _map.contains(o);
   }
 } // app
